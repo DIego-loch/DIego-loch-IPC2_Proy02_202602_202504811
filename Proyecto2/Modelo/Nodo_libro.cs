@@ -1,17 +1,18 @@
 using System;
-using Clase_libro;
-namespace Nodo_libros;
 
-public class Nodo_libro
+namespace IPC2_Proy02.Modelo
 {
-    public Libro Nodo_actual{ get; set; }
-    public Nodo_libro? Nodo_izquierda { get; set; }
-    public Nodo_libro? Nodo_derecha { get; set; }
-
-    public Nodo_libro(Libro dato)
+    public class NodoLibro
     {
-        Nodo_actual = dato;
-        Nodo_izquierda = null;
-        Nodo_derecha = null;
+        public Libro Dato { get; set; }
+        public NodoLibro Izquierda { get; set; }
+        public NodoLibro Derecha { get; set; }
+
+        public NodoLibro(Libro dato)
+        {
+            Dato = dato;
+            Izquierda = null;
+            Derecha = null;
+        }
     }
 }

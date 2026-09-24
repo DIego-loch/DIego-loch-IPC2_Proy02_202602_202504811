@@ -1,169 +1,135 @@
 using System;
-using Clase_libro;
-using Nodo_libros;
 
-namespace ArbolLibro;
-
-public class Arbol_libro
+namespace IPC2_Proy02.Modelo
 {
-    public Nodo_libro? raiz { get; set; }
-    public Nodo_libro? nodo_anterior { get; set; }
-
-    public void IngresarLibro(Libro libro)
+    public class ArbolLibros
     {
-        Nodo_libro nodo = new Nodo_libro(libro);
+        public NodoLibro Raiz { get; set; }
 
-        if (raiz == null)
+        public ArbolLibros()
         {
-            raiz = nodo;
-            return;
-
+            Raiz = null;
         }
-        Nodo_libro padre = raiz;
-        while (true)
+
+        public bool EstaVacio()
         {
-            if (nodo.Nodo_actual.ISBN < padre.Nodo_actual.ISBN)
+            return Raiz == null;
+        }
+
+        public bool Insertar(Libro libro)
+        {
+            NodoLibro nuevo = new NodoLibro(libro);
+
+            if (Raiz == null)
             {
-                if (padre.Nodo_izquierda == null)
+                Raiz = nuevo;
+                return true;
+            }
+
+            NodoLibro actual = Raiz;
+            while (true)
+            {
+                if (libro.ISBN < actual.Dato.ISBN)
                 {
-                    padre.Nodo_izquierda = nodo;
-                    return;
+                    if (actual.Izquierda == null)
+                    {
+                        actual.Izquierda = nuevo;
+                        return true;
+                    }
+                    actual = actual.Izquierda;
+                }
+                else if (libro.ISBN > actual.Dato.ISBN)
+                {
+                    if (actual.Derecha == null)
+                    {
+                        actual.Derecha = nuevo;
+                        return true;
+                    }
+                    actual = actual.Derecha;
                 }
                 else
                 {
-                    padre = padre.Nodo_izquierda;
+                    return false; // ISBN duplicado
                 }
             }
-            else if (nodo.Nodo_actual.ISBN > padre.Nodo_actual.ISBN)
+        }
+
+        public Libro Buscar(int isbn)
+        {
+            NodoLibro actual = Raiz;
+            while (actual != null)
             {
-                if (padre.Nodo_derecha == null)
-                {
-                    padre.Nodo_derecha = nodo;
-                    return;
-                }
-                else
-                {
-                    padre = padre.Nodo_derecha;
-                }
+                if (isbn == actual.Dato.ISBN) return actual.Dato;
+                actual = isbn < actual.Dato.ISBN
+                    ? actual.Izquierda
+                    : actual.Derecha;
             }
+            return null;
+        }
+
+        public Libro Minimo()
+        {
+            if (Raiz == null) return null;
+            NodoLibro a = Raiz;
+            while (a.Izquierda != null) a = a.Izquierda;
+            return a.Dato;
+        }
+
+        public Libro Maximo()
+        {
+            if (Raiz == null) return null;
+            NodoLibro a = Raiz;
+            while (a.Derecha != null) a = a.Derecha;
+            return a.Dato;
+        }
+
+        public bool Eliminar(int isbn)
+        {
+            if (Buscar(isbn) == null) return false;
+            Raiz = EliminarRec(Raiz, isbn);
+            return true;
+        }
+
+        private NodoLibro EliminarRec(NodoLibro nodo, int isbn)
+        {
+            if (nodo == null) return null;
+
+            if (isbn < nodo.Dato.ISBN)
+                nodo.Izquierda = EliminarRec(nodo.Izquierda, isbn);
+            else if (isbn > nodo.Dato.ISBN)
+                nodo.Derecha = EliminarRec(nodo.Derecha, isbn);
             else
             {
-                return;
+                if (nodo.Izquierda == null) return nodo.Derecha;
+                if (nodo.Derecha == null) return nodo.Izquierda;
+
+                NodoLibro sucesor = MinimoNodo(nodo.Derecha);
+                nodo.Dato = sucesor.Dato;
+                nodo.Derecha = EliminarRec(nodo.Derecha, sucesor.Dato.ISBN);
             }
+            return nodo;
         }
 
-    }
-    public Nodo_libro BuscarInfo(int isbn)
-    {
-        Nodo_libro buscador = raiz;
-        while (buscador != null)
+        private NodoLibro MinimoNodo(NodoLibro n)
         {
-            if (isbn == buscador.Nodo_actual.ISBN)
-            {
-                return buscador;
-            }
-            else if (isbn < buscador.Nodo_actual.ISBN)
-            {
-                nodo_anterior = buscador;
-                buscador = buscador.Nodo_izquierda;
-            }
-            else if (isbn > buscador.Nodo_actual.ISBN)
-            {
-                nodo_anterior = buscador;
-                buscador = buscador.Nodo_derecha;
-            }
+            while (n.Izquierda != null) n = n.Izquierda;
+            return n;
         }
-        return null;
-    }
 
-    public Libro Min()
-    {
-        Nodo_libro min = raiz;
-        if (min == null) return null;
-        while (min.Nodo_izquierda != null)
+        // ✅ Devuelve TDA propio ListaLibros (sin arreglos)
+        public ListaLibros Inorden()
         {
-            min = min.Nodo_izquierda;
+            ListaLibros lista = new ListaLibros();
+            InordenRec(Raiz, lista);
+            return lista;
         }
-        return min.Nodo_actual;
-    }
 
-    public Libro Max()
-    {
-        Nodo_libro max = raiz;
-        if (max == null) return null;
-        while (max.Nodo_derecha != null)
+        private void InordenRec(NodoLibro n, ListaLibros lista)
         {
-            max = max.Nodo_derecha;
+            if (n == null) return;
+            InordenRec(n.Izquierda, lista);
+            lista.Agregar(n.Dato);
+            InordenRec(n.Derecha, lista);
         }
-        return max.Nodo_actual;
     }
-
-    public void Recorrer()
-    {
-        Nodo_libro inorden = raiz;
-        Inorden(inorden);
-        return;
-    }
-    public void Inorden(Nodo_libro inorden)
-    {
-        if (inorden == null) return;
-        Inorden(inorden.Nodo_izquierda);
-        Console.WriteLine(inorden.Nodo_actual.ISBN);
-        Inorden(inorden.Nodo_derecha);
-
-    }
-
-    public bool Eliminar(int isbn)
-    {
-        if (raiz == null) return false;
-
-        // Verificar que exista antes de eliminar
-        if (BuscarInfo(isbn) == null) return false;
-
-        raiz = EliminarRecursivo(raiz, isbn);
-        return true;
-    }
-
-    private Nodo_libro? EliminarRecursivo(Nodo_libro? nodo, int isbn)
-    {
-        if (nodo == null) return null;
-
-        if (isbn < nodo.Nodo_actual.ISBN)
-        {
-            nodo.Nodo_izquierda = EliminarRecursivo(nodo.Nodo_izquierda, isbn);
-        }
-        else if (isbn > nodo.Nodo_actual.ISBN)
-        {
-            nodo.Nodo_derecha = EliminarRecursivo(nodo.Nodo_derecha, isbn);
-        }
-        else
-        {
-            // Caso 1 y 2: 0 hijos o 1 hijo
-            if (nodo.Nodo_izquierda == null)
-                return nodo.Nodo_derecha;
-            if (nodo.Nodo_derecha == null)
-                return nodo.Nodo_izquierda;
-
-            // Caso 3: 2 hijos → buscar sucesor inorden
-            Nodo_libro sucesor = MinimoNodo(nodo.Nodo_derecha);
-
-            // Copiar los datos del sucesor al nodo actual
-            nodo.Nodo_actual = sucesor.Nodo_actual;
-
-            // Eliminar el sucesor original
-            nodo.Nodo_derecha = EliminarRecursivo(nodo.Nodo_derecha, sucesor.Nodo_actual.ISBN);
-        }
-
-        return nodo;
-    }
-
-    private Nodo_libro MinimoNodo(Nodo_libro nodo)
-    {
-        while (nodo.Nodo_izquierda != null)
-        {
-            nodo = nodo.Nodo_izquierda;
-        }
-        return nodo;
-    }
-
 }

@@ -1,78 +1,103 @@
 using System;
-using Nodo_Categoria;
-using Categoria_libro;
 
-namespace List_enlazada;
-
-public class Lista_hijos
+namespace IPC2_Proy02.Modelo
 {
-    public Nodo_categoria? raiz { get; set; }
-
-    public Lista_hijos()
+    // Lista enlazada simple de categorías (hijos), ordenada alfabéticamente
+    public class ListaHijos
     {
-        raiz = null;
-    }
+        public NodoCategoria Raiz { get; set; }
+        public int Cantidad { get; set; }
 
-    // Inserta una categoría ordenada alfabéticamente
-    public void Ingreso_lista(Categoria categoria)
-    {
-        Nodo_categoria nuevo = new Nodo_categoria(categoria);
-
-        // Caso 1: lista vacía
-        if (raiz == null)
+        public ListaHijos()
         {
-            raiz = nuevo;
-            return;
+            Raiz = null;
+            Cantidad = 0;
         }
 
-        // Caso 2: el nuevo va antes que la cabeza
-        if (string.Compare(nuevo.Nodo_actual.nombre_categoria, raiz.Nodo_actual.nombre_categoria) < 0)
+        public bool EstaVacia()
         {
-            nuevo.siguiente = raiz;
-            raiz = nuevo;
-            return;
+            return Raiz == null;
         }
 
-        // Caso 3: el nuevo va en medio o al final
-        Nodo_categoria actual = raiz;
-        while (actual.siguiente != null &&
-               string.Compare(actual.siguiente.Nodo_actual.nombre_categoria, nuevo.Nodo_actual.nombre_categoria) < 0)
+        // Inserta ordenado alfabéticamente (case-insensitive), sin duplicados
+        public bool Insertar(Categoria cat)
         {
-            actual = actual.siguiente;
+            NodoCategoria nuevo = new NodoCategoria(cat);
+
+            if (Raiz == null)
+            {
+                Raiz = nuevo;
+                Cantidad = 1;
+                return true;
+            }
+
+            int cmp = string.Compare(nuevo.Dato.Nombre, Raiz.Dato.Nombre,
+                                     StringComparison.OrdinalIgnoreCase);
+            if (cmp == 0) return false;
+
+            if (cmp < 0)
+            {
+                nuevo.Siguiente = Raiz;
+                Raiz = nuevo;
+                Cantidad++;
+                return true;
+            }
+
+            NodoCategoria actual = Raiz;
+            while (actual.Siguiente != null)
+            {
+                int c2 = string.Compare(nuevo.Dato.Nombre,
+                                        actual.Siguiente.Dato.Nombre,
+                                        StringComparison.OrdinalIgnoreCase);
+                if (c2 == 0) return false;
+                if (c2 < 0) break;
+                actual = actual.Siguiente;
+            }
+
+            nuevo.Siguiente = actual.Siguiente;
+            actual.Siguiente = nuevo;
+            Cantidad++;
+            return true;
         }
 
-        // Insertar entre actual y actual.siguiente
-        nuevo.siguiente = actual.siguiente;
-        actual.siguiente = nuevo;
-    }
-
-    // Busca un hijo por nombre
-    public Nodo_categoria? Buscar(string nombre)
-    {
-        Nodo_categoria actual = raiz;
-        while (actual != null)
+        public NodoCategoria Buscar(string nombre)
         {
-            if (actual.Nodo_actual.nombre_categoria == nombre)
-                return actual;
-            actual = actual.siguiente;
+            NodoCategoria actual = Raiz;
+            while (actual != null)
+            {
+                if (string.Equals(actual.Dato.Nombre, nombre,
+                                  StringComparison.OrdinalIgnoreCase))
+                    return actual;
+                actual = actual.Siguiente;
+            }
+            return null;
         }
-        return null;
-    }
 
-    // Verifica si la lista está vacía
-    public bool EstaVacia()
-    {
-        return raiz == null;
-    }
-
-    // Muestra todos los hijos (para debug)
-    public void Mostrar_lista()
-    {
-        Nodo_categoria aux = raiz;
-        while (aux != null)
+        public bool Eliminar(string nombre)
         {
-            Console.WriteLine(aux.Nodo_actual.nombre_categoria);
-            aux = aux.siguiente;
+            if (Raiz == null) return false;
+
+            if (string.Equals(Raiz.Dato.Nombre, nombre,
+                              StringComparison.OrdinalIgnoreCase))
+            {
+                Raiz = Raiz.Siguiente;
+                Cantidad--;
+                return true;
+            }
+
+            NodoCategoria actual = Raiz;
+            while (actual.Siguiente != null)
+            {
+                if (string.Equals(actual.Siguiente.Dato.Nombre, nombre,
+                                  StringComparison.OrdinalIgnoreCase))
+                {
+                    actual.Siguiente = actual.Siguiente.Siguiente;
+                    Cantidad--;
+                    return true;
+                }
+                actual = actual.Siguiente;
+            }
+            return false;
         }
     }
 }

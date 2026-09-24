@@ -1,19 +1,23 @@
 using System;
-using List_enlazada;
-using ArbolLibro;
 
-namespace Categoria_libro;
-
-public class Categoria
+namespace IPC2_Proy02.Modelo
 {
-    public string nombre_categoria { get; set; }
-    public Lista_hijos? lista_hijos { get; set; }
-    public Arbol_libro? lista_libros { get; set; }
-
-    public Categoria(string nombre)
+    public class Categoria
     {
-        nombre_categoria = nombre;
-        lista_hijos = new Lista_hijos();
-        lista_libros = new Arbol_libro();
+        public string Nombre { get; set; }
+        public ListaHijos Hijos { get; set; }
+        public ArbolLibros Libros { get; set; }
+
+        public Categoria(string nombre)
+        {
+            Nombre = nombre;
+            Hijos = new ListaHijos();
+            Libros = new ArbolLibros();
+        }
+
+        public override string ToString()
+        {
+            return Nombre;
+        }
     }
 }

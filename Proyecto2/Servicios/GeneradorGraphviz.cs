@@ -1,80 +1,155 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using ArbolCategoria;
-using Nodo_libros;
-using Nodo_Categoria;
+using IPC2_Proy02.Modelo;
 
-namespace Servicios;
-
-public class GeneradorGraphviz
+namespace IPC2_Proy02.Servicios
 {
-    public string GenerarDotCategorias(Arbol_Categoria arbol)
+    public class GeneradorGraphviz
     {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("digraph G {");
-        sb.AppendLine("    node [shape=box];");
+        private string carpetaSalida;
 
-        if (arbol.raiz != null)
-            EscribirCategorias(arbol.raiz, sb, ref _contador);
-
-        sb.AppendLine("}");
-        return sb.ToString();
-    }
-
-    private int _contador = 0;
-
-    private void EscribirCategorias(Nodo_categoria nodo, StringBuilder sb, ref int contador)
-    {
-        int idActual = contador++;
-        string etiqueta = nodo.Nodo_actual.nombre_categoria;
-
-        sb.AppendLine($"    n{idActual} [label=\"{etiqueta}\"];");
-
-        Nodo_categoria? hijo = nodo.Nodo_actual.lista_hijos.raiz;
-        while (hijo != null)
+        public GeneradorGraphviz(string carpeta)
         {
-            int idHijo = contador;
-            EscribirCategorias(hijo, sb, ref contador);
-            sb.AppendLine($"    n{idActual} -> n{idHijo};");
-            hijo = hijo.siguiente;
-        }
-    }
-
-    public string GenerarDotLibros(Nodo_categoria categoria)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("digraph G {");
-        sb.AppendLine("    node [shape=box];");
-        sb.AppendLine($"    label=\"{categoria.Nodo_actual.nombre_categoria}\";");
-
-        if (categoria.Nodo_actual.lista_libros?.raiz != null)
-        {
-            EscribirLibros(categoria.Nodo_actual.lista_libros.raiz, sb);
+            carpetaSalida = carpeta;
+            if (!Directory.Exists(carpetaSalida))
+                Directory.CreateDirectory(carpetaSalida);
         }
 
-        sb.AppendLine("}");
-        return sb.ToString();
-    }
+        // ============================================================
+        //  ÁRBOL DE CATEGORÍAS → .dot / .png
+        // ============================================================
 
-    private void EscribirLibros(Nodo_libro nodo, StringBuilder sb)
-    {
-        sb.AppendLine($"    l{nodo.Nodo_actual.ISBN} [label=\"{nodo.Nodo_actual.ISBN}\\n{nodo.Nodo_actual.titulo}\"];");
-
-        if (nodo.Nodo_izquierda != null)
+        public string GenerarArbolCategorias(ArbolCategorias arbol)
         {
-            sb.AppendLine($"    l{nodo.Nodo_actual.ISBN} -> l{nodo.Nodo_izquierda.Nodo_actual.ISBN};");
-            EscribirLibros(nodo.Nodo_izquierda, sb);
-        }
-        if (nodo.Nodo_derecha != null)
-        {
-            sb.AppendLine($"    l{nodo.Nodo_actual.ISBN} -> l{nodo.Nodo_derecha.Nodo_actual.ISBN};");
-            EscribirLibros(nodo.Nodo_derecha, sb);
-        }
-    }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("digraph G {");
+            sb.AppendLine("  node [shape=box, style=filled, fillcolor=\"#B3E5FC\"];");
+            sb.AppendLine("  rankdir=TB;");
 
-    public void Guardar(string contenido, string ruta)
-    {
-        File.WriteAllText(ruta, contenido);
+            int contador = 0;
+            if (arbol.Raiz != null)
+                Recorrer(arbol.Raiz, ref contador, sb, -1);
+
+            sb.AppendLine("}");
+            return GuardarYRenderizar(sb.ToString(), "categorias");
+        }
+
+        private int Recorrer(NodoCategoria n, ref int contador,
+                             StringBuilder sb, int padreId)
+        {
+            if (n == null) return -1;
+
+            int id = contador++;
+            sb.AppendLine("  n" + id + " [label=\"" +
+                          Escapar(n.Dato.Nombre) + "\"];");
+
+            if (padreId >= 0)
+                sb.AppendLine("  n" + padreId + " -> n" + id + ";");
+
+            NodoCategoria h = n.Dato.Hijos.Raiz;
+            while (h != null)
+            {
+                Recorrer(h, ref contador, sb, id);
+                h = h.Siguiente;
+            }
+            return id;
+        }
+
+        // ============================================================
+        //  BST DE LIBROS → .dot / .png
+        // ============================================================
+
+        public string GenerarArbolLibros(ArbolLibros arbol, string nombreCat)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("digraph G {");
+            sb.AppendLine("  node [shape=record, style=filled, fillcolor=\"#C8E6C9\"];");
+            sb.AppendLine("  label=\"Libros en: " + Escapar(nombreCat) + "\";");
+            sb.AppendLine("  labelloc=t;");
+
+            int contador = 0;
+            if (arbol.Raiz != null)
+                RecorrerLibro(arbol.Raiz, ref contador, sb);
+
+            sb.AppendLine("}");
+            return GuardarYRenderizar(sb.ToString(),
+                                      "libros_" + Sanitizar(nombreCat));
+        }
+
+        private void RecorrerLibro(NodoLibro n, ref int contador, StringBuilder sb)
+        {
+            if (n == null) return;
+
+            int id = contador++;
+            string label = "{ ISBN: " + n.Dato.ISBN +
+                           " | " + Escapar(n.Dato.Titulo) +
+                           " | " + Escapar(n.Dato.Autor) + " }";
+
+            sb.AppendLine("  n" + id + " [label=\"" + label + "\"];");
+
+            if (n.Izquierda != null)
+            {
+                int idIzq = contador;
+                RecorrerLibro(n.Izquierda, ref contador, sb);
+                sb.AppendLine("  n" + id + " -> n" + idIzq + ";");
+            }
+            if (n.Derecha != null)
+            {
+                int idDer = contador;
+                RecorrerLibro(n.Derecha, ref contador, sb);
+                sb.AppendLine("  n" + id + " -> n" + idDer + ";");
+            }
+        }
+
+        // ============================================================
+        //  UTILIDADES
+        // ============================================================
+
+        private string GuardarYRenderizar(string dot, string nombre)
+        {
+            string rutaDot = Path.Combine(carpetaSalida, nombre + ".dot");
+            string rutaPng = Path.Combine(carpetaSalida, nombre + ".png");
+
+            File.WriteAllText(rutaDot, dot);
+
+            try
+            {
+                Process p = new Process();
+                p.StartInfo.FileName = "dot";
+                p.StartInfo.Arguments = "-Tpng \"" + rutaDot +
+                                        "\" -o \"" + rutaPng + "\"";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.CreateNoWindow = true;
+                p.Start();
+                p.WaitForExit();
+            }
+            catch
+            {
+                // Graphviz no instalado o no en PATH: se genera solo el .dot
+            }
+
+            return rutaPng;
+        }
+
+        private string Escapar(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            return s.Replace("\\", "\\\\")
+                    .Replace("\"", "\\\"")
+                    .Replace("\n", " ");
+        }
+
+        private string Sanitizar(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "sin_nombre";
+
+            char[] invalidos = Path.GetInvalidFileNameChars();
+            string res = s;
+            foreach (char c in invalidos)
+                res = res.Replace(c, '_');
+            return res;
+        }
     }
 }

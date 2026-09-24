@@ -1,126 +1,93 @@
 using System;
-using Categoria_libro;
-using Nodo_Categoria;
 
-namespace ArbolCategoria;
-
-public class Arbol_Categoria
+namespace IPC2_Proy02.Modelo
 {
-    public Nodo_categoria? raiz { get; set; }
-
-    public Arbol_Categoria()
+    public class ArbolCategorias
     {
-        raiz = null;
-    }
+        public NodoCategoria Raiz { get; set; }
 
-    // Verifica si el árbol está vacío
-    public bool EstaVacio()
-    {
-        return raiz == null;
-    }
-
-    // Inserta una categoría como hijo de un padre (o como raíz si está vacío)
-    public bool Insertar(string nombreNueva, string nombrePadre)
-    {
-        // Caso 1: árbol vacío → la nueva es la raíz
-        if (raiz == null)
+        public ArbolCategorias()
         {
-            raiz = new Nodo_categoria(new Categoria(nombreNueva));
-            return true;
+            Raiz = null;
         }
 
-        // Verificar que no exista ya (duplicado global)
-        if (Existe(nombreNueva))
+        public bool EstaVacio()
         {
-            Console.WriteLine("Ya existe una categoría con ese nombre: " + nombreNueva);
-            return false;
+            return Raiz == null;
         }
 
-        // Buscar el padre
-        Nodo_categoria? padre = Buscar(nombrePadre);
-        if (padre == null)
+        public bool Insertar(string nombreNueva, string nombrePadre)
         {
-            Console.WriteLine("Padre no encontrado: " + nombrePadre);
-            return false;
+            if (BuscarNodo(nombreNueva) != null) return false;
+
+            Categoria nueva = new Categoria(nombreNueva);
+
+            if (Raiz == null)
+            {
+                if (!string.IsNullOrEmpty(nombrePadre)) return false;
+                Raiz = new NodoCategoria(nueva);
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(nombrePadre)) return false;
+
+            NodoCategoria padre = BuscarNodo(nombrePadre);
+            if (padre == null) return false;
+
+            return padre.Dato.Hijos.Insertar(nueva);
         }
 
-        // Insertar en la lista de hijos del padre
-        padre.Nodo_actual.lista_hijos.Ingreso_lista(new Categoria(nombreNueva));
-        return true;
-    }
-
-    // Inserta una categoría como raíz (si el árbol está vacío)
-    public bool InsertarRaiz(string nombre)
-    {
-        if (raiz != null) return false;
-
-        raiz = new Nodo_categoria(new Categoria(nombre));
-        return true;
-    }
-
-    // Busca una categoría por nombre (recursivo)
-    public Nodo_categoria? Buscar(string nombre)
-    {
-        return BuscarRecursivo(raiz, nombre);
-    }
-
-    private Nodo_categoria? BuscarRecursivo(Nodo_categoria? actual, string nombre)
-    {
-        if (actual == null) return null;
-
-        if (actual.Nodo_actual.nombre_categoria == nombre)
-            return actual;
-
-        // Recorrer los hijos
-        Nodo_categoria? hijo = actual.Nodo_actual.lista_hijos.raiz;
-        while (hijo != null)
+        public NodoCategoria BuscarNodo(string nombre)
         {
-            Nodo_categoria? encontrado = BuscarRecursivo(hijo, nombre);
-            if (encontrado != null) return encontrado;
-            hijo = hijo.siguiente;
+            return BuscarNodoRec(Raiz, nombre);
         }
 
-        return null;
-    }
-
-    // Verifica si una categoría ya existe
-    public bool Existe(string nombre)
-    {
-        return Buscar(nombre) != null;
-    }
-
-    // Recorrido preorden: muestra toda la jerarquía
-    public void Recorrer()
-    {
-        RecorrerRecursivo(raiz, 0);
-    }
-
-    private void RecorrerRecursivo(Nodo_categoria? actual, int nivel)
-    {
-        if (actual == null) return;
-
-        // Sangría según nivel
-        for (int i = 0; i < nivel; i++) Console.Write("   ");
-        Console.WriteLine(actual.Nodo_actual.nombre_categoria);
-
-        // Recorrer hijos
-        Nodo_categoria? hijo = actual.Nodo_actual.lista_hijos.raiz;
-        while (hijo != null)
+        private NodoCategoria BuscarNodoRec(NodoCategoria actual, string nombre)
         {
-            RecorrerRecursivo(hijo, nivel + 1);
-            hijo = hijo.siguiente;
-        }
-    }
+            if (actual == null) return null;
 
-    // Recorrer a partir de una categoría específica
-    public void RecorrerDesde(string nombre)
-    {
-        Nodo_categoria? nodo = Buscar(nombre);
-        if (nodo == null)
-        {
-            Console.WriteLine("Categoría no encontrada: " + nombre);
-            return;
+            if (string.Equals(actual.Dato.Nombre, nombre,
+                              StringComparison.OrdinalIgnoreCase))
+                return actual;
+
+            NodoCategoria hijo = actual.Dato.Hijos.Raiz;
+            while (hijo != null)
+            {
+                NodoCategoria enc = BuscarNodoRec(hijo, nombre);
+                if (enc != null) return enc;
+                hijo = hijo.Siguiente;
+            }
+            return null;
         }
-        RecorrerRecursivo(nodo, 0);
+
+        public Categoria Buscar(string nombre)
+        {
+            NodoCategoria n = BuscarNodo(nombre);
+            return n == null ? null : n.Dato;
+        }
+
+        // ✅ Ahora devuelve TDA propio ListaCadenas
+        public ListaCadenas RecorrerPreorden(string desde)
+        {
+            ListaCadenas res = new ListaCadenas();
+            NodoCategoria inicio = string.IsNullOrEmpty(desde)
+                ? Raiz
+                : BuscarNodo(desde);
+            PreordenRec(inicio, 0, res);
+            return res;
+        }
+
+        private void PreordenRec(NodoCategoria n, int nivel, ListaCadenas res)
+        {
+            if (n == null) return;
+            res.Agregar(n.Dato.Nombre, nivel);
+
+            NodoCategoria h = n.Dato.Hijos.Raiz;
+            while (h != null)
+            {
+                PreordenRec(h, nivel + 1, res);
+                h = h.Siguiente;
+            }
+        }
     }
 }

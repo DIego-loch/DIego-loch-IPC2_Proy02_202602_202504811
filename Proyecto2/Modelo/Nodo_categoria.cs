@@ -1,19 +1,16 @@
 using System;
-using Categoria_libro;
-using List_enlazada;
 
-namespace Nodo_Categoria;
-
-public class Nodo_categoria
+namespace IPC2_Proy02.Modelo
 {
-    public Categoria Nodo_actual { get; set; }
-    public Lista_hijos hijos { get; set; }
-    public Nodo_categoria? siguiente { get; set; }
-
-    public Nodo_categoria(Categoria dato)
+    public class NodoCategoria
     {
-        Nodo_actual = dato;
-        hijos = new Lista_hijos();
-        siguiente = null;
+        public Categoria Dato { get; set; }
+        public NodoCategoria Siguiente { get; set; }
+
+        public NodoCategoria(Categoria dato)
+        {
+            Dato = dato;
+            Siguiente = null;
+        }
     }
 }
