@@ -107,9 +107,9 @@ public class Arbol_libro
     public void Inorden(Nodo_libro inorden)
     {
         if (inorden == null) return;
-        Inorden(inorden.Nodo_izquierdo);
+        Inorden(inorden.Nodo_izquierda);
         Console.WriteLine(inorden.Nodo_actual.ISBN);
-        Inorden(inorden.Nodo_derecho);
+        Inorden(inorden.Nodo_derecha);
 
     }
 
