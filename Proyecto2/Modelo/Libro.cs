@@ -12,7 +12,7 @@ public class Libro
     public Libro(int ISBN, string titulo, string autor, Categoria categoria )
     {
         this.ISBN = ISBN;
-        this.titulo = titulo;
+       this.titulo = titulo;
         this.autor = autor;
         this.categoria = categoria;
     }

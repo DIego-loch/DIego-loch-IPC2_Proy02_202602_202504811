@@ -6,6 +6,11 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
-        return Content("Servidor MVC funcionando correctamente");
+        return View();
+    }
+
+    public IActionResult Ayuda()
+    {
+        return View();
     }
 }

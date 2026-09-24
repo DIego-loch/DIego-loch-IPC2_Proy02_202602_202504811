@@ -32,3 +32,7 @@
 /home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/Proyecto2.pdb
 /home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/Proyecto2.genruntimeconfig.cache
 /home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/ref/Proyecto2.dll
+/home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/bin/Debug/net10.0/Proyecto2.staticwebassets.runtime.json
+/home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/Proyecto2.RazorAssemblyInfo.cache
+/home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/Proyecto2.RazorAssemblyInfo.cs
+/home/diego_loch/Documentos/IPC2/LABORATORIO/PROYECTO/PROYECTO2/Proyecto2/obj/Debug/net10.0/compressed/s12fktx6py-{0}-ry38jxj8hq-ry38jxj8hq.gz

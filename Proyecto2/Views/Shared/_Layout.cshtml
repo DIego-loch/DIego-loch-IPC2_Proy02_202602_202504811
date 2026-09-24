@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Librería</title>
+    <link rel="stylesheet" href="/css/estilos.css" />
+</head>
+<body>
+    <header>
+        <nav>
+            <a asp-controller="Home" asp-action="Index">Inicio</a>
+            <a asp-controller="Xml" asp-action="Index">Cargar XML</a>
+            <a asp-controller="Catalogo" asp-action="Index">Catálogo</a>
+            <a asp-controller="Home" asp-action="Ayuda">Ayuda</a>
+        </nav>
+    </header>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer>
+        <hr />
+        <p>IPC2 - Proyecto 2 - 2026</p>
+    </footer>
+</body>
+</html>
