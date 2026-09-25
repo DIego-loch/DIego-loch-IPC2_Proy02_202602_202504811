@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libreria>
+  <listaCategorias>
+    <categoria nombre="Ficción"/>
+    <categoria nombre="Ciencia Ficción" padre="Ficción"/>
+    <categoria nombre="Distopía" padre="Ciencia Ficción"/>
+    <categoria nombre="Fantasía" padre="Ficción"/>
+    <categoria nombre="No Ficción"/>
+    <categoria nombre="Historia" padre="No Ficción"/>
+  </listaCategorias>
+
+  <listaLibros>
+    <libro isbn="1001">
+      <titulo>1984</titulo>
+      <autor>George Orwell</autor>
+      <categoria>Distopía</categoria>
+    </libro>
+    <libro isbn="1002">
+      <titulo>Un Mundo Feliz</titulo>
+      <autor>Aldous Huxley</autor>
+      <categoria>Distopía</categoria>
+    </libro>
+    <libro isbn="2001">
+      <titulo>El Hobbit</titulo>
+      <autor>J.R.R. Tolkien</autor>
+      <categoria>Fantasía</categoria>
+    </libro>
+    <libro isbn="3001">
+      <titulo>Sapiens</titulo>
+      <autor>Yuval Noah Harari</autor>
+      <categoria>Historia</categoria>
+    </libro>
+  </listaLibros>
+</libreria>

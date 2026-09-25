@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Sistema de Librería - IPC2</title>
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <header>
+        <div class="logo">
+            <span class="icono">📚</span>
+            <h1>Sistema de Librería</h1>
+        </div>
+        <nav>
+            <button class="tab activo" data-tab="inicio">🏠 Inicio</button>
+            <button class="tab" data-tab="categorias">🗂️ Categorías</button>
+            <button class="tab" data-tab="libros">📖 Libros</button>
+            <button class="tab" data-tab="xml">📂 Cargar XML</button>
+            <button class="tab" data-tab="ayuda">❓ Ayuda</button>
+        </nav>
+    </header>
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+        <!-- ---------- INICIO ---------- -->
+        <section id="inicio" class="panel activo">
+            <h2>Bienvenido al Sistema de Librería</h2>
+            <p class="subtitulo">Administra tu catálogo de libros de forma eficiente.</p>
+
+            <div class="acciones-rapidas">
+                <button class="btn-primario" onclick="inicializarSistema()">
+                    🔄 Inicializar Sistema
+                </button>
+                <button class="btn-secundario" onclick="irA('xml')">
+                    📂 Cargar archivo XML
+                </button>
+            </div>
+
+            <div class="info-cards">
+                <div class="card">
+                    <h3>📊 Estado del sistema</h3>
+                    <p id="estadoSistema">Sin inicializar</p>
+                </div>
+                <div class="card">
+                    <h3>📖 Libros en catálogo</h3>
+                    <p id="totalLibros">0</p>
+                </div>
+                <div class="card">
+                    <h3>🗂️ Categorías</h3>
+                    <p id="totalCategorias">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------- CATEGORÍAS ---------- -->
+        <section id="categorias" class="panel">
+            <h2>Gestión de Categorías</h2>
+
+            <div class="form-inline">
+                <input type="text" id="catPadre" placeholder="Padre (vacío = raíz)">
+                <input type="text" id="catNombre" placeholder="Nombre de la categoría">
+                <button class="btn-primario" onclick="crearCategoria()">
+                    ➕ Agregar
+                </button>
+                <button class="btn-secundario" onclick="cargarCategorias()">
+                    🔄 Actualizar
+                </button>
+                <button class="btn-secundario" onclick="verGrafoCategorias()">
+                    🌳 Ver grafo
+                </button>
+            </div>
+
+            <div class="layout-doble">
+                <div>
+                    <h3>Estructura jerárquica</h3>
+                    <div id="arbolCategorias" class="arbol"></div>
+                </div>
+                <div>
+                    <h3>Grafo generado</h3>
+                    <div id="imgGrafoCats" class="contenedor-imagen">
+                        <p class="placeholder">Presiona "Ver grafo" para generar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------- LIBROS ---------- -->
+        <section id="libros" class="panel">
+            <h2>Gestión de Libros</h2>
+
+            <div class="form-grid">
+                <input type="number" id="libIsbn" placeholder="ISBN">
+                <input type="text" id="libTitulo" placeholder="Título">
+                <input type="text" id="libAutor" placeholder="Autor">
+                <input type="text" id="libCategoria" placeholder="Categoría">
+                <button class="btn-primario" onclick="crearLibro()">
+                    ➕ Registrar
+                </button>
+            </div>
+
+            <div class="form-inline">
+                <button class="btn-secundario" onclick="cargarLibros()">
+                    📋 Ver todos (asc)
+                </button>
+                <button class="btn-secundario" onclick="verMenor()">
+                    ⬇️ Menor ISBN
+                </button>
+                <button class="btn-secundario" onclick="verMayor()">
+                    ⬆️ Mayor ISBN
+                </button>
+                <input type="number" id="buscarIsbn" placeholder="Buscar por ISBN">
+                <button class="btn-secundario" onclick="buscarLibro()">
+                    🔍 Buscar
+                </button>
+            </div>
+
+            <div id="resultadoBusqueda" class="resultado-busqueda"></div>
+
+            <h3>Catálogo completo (ordenado por ISBN)</h3>
+            <div class="tabla-container">
+                <table id="tablaLibros">
+                    <thead>
+                        <tr>
+                            <th>ISBN</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyLibros">
+                        <tr><td colspan="5" class="vacio">No hay libros cargados</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Libros de una categoría</h3>
+            <div class="form-inline">
+                <input type="text" id="catFiltro" placeholder="Nombre de la categoría">
+                <button class="btn-secundario" onclick="verLibrosCategoria()">
+                    🌳 Ver grafo BST
+                </button>
+            </div>
+            <div id="imgGrafoLibros" class="contenedor-imagen">
+                <p class="placeholder">Presiona "Ver grafo BST" para generar</p>
+            </div>
+        </section>
+
+        <!-- ---------- XML ---------- -->
+        <section id="xml" class="panel">
+            <h2>Cargar archivo XML</h2>
+            <p class="subtitulo">
+                Selecciona cualquier archivo <code>.xml</code> de tu computadora.
+            </p>
+
+            <div class="form-inline">
+                <input type="file" id="archivoXml" accept=".xml"
+                       style="flex:1; padding:0.6rem; border:2px dashed #cbd5e1;
+                              border-radius:8px; background:white; cursor:pointer;">
+                <button class="btn-primario" onclick="subirXml()">
+                    📂 Cargar XML
+                </button>
+            </div>
+
+            <pre id="logXml" class="log"></pre>
+
+            <div class="info-card">
+                <h3>📝 Formato del XML</h3>
+                <pre class="code-block">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;libreria&gt;
+          &lt;listaCategorias&gt;
+            &lt;categoria nombre="Ficción"/&gt;
+            &lt;categoria nombre="Ciencia Ficción" padre="Ficción"/&gt;
+          &lt;/listaCategorias&gt;
+          &lt;listaLibros&gt;
+            &lt;libro isbn="1001"&gt;
+              &lt;titulo&gt;1984&lt;/titulo&gt;
+              &lt;autor&gt;George Orwell&lt;/autor&gt;
+              &lt;categoria&gt;Ciencia Ficción&lt;/categoria&gt;
+            &lt;/libro&gt;
+          &lt;/listaLibros&gt;
+        &lt;/libreria&gt;</pre>
+            </div>
+        </section>
+
+        <!-- ---------- AYUDA ---------- -->
+        <section id="ayuda" class="panel">
+            <h2>Información del Estudiante</h2>
+
+            <div class="info-card">
+                <p><strong>Nombre:</strong> Tu Nombre Completo</p>
+                <p><strong>Carné:</strong> 202600000</p>
+                <p><strong>Curso:</strong> Introducción a la Programación y Computación 2</p>
+                <p><strong>Proyecto:</strong> No. 2 - Sistema de Librería</p>
+                <p><strong>Universidad:</strong> USAC - Facultad de Ingeniería</p>
+                <p>
+                    <strong>Documentación:</strong>
+                    <a href="https://github.com/TU-USUARIO/IPC2_Proy02_202602_202600000"
+                       target="_blank">
+                        Ver en GitHub →
+                    </a>
+                </p>
+            </div>
+
+            <div class="info-card">
+                <h3>🛠️ Tecnologías utilizadas</h3>
+                <ul>
+                    <li>C# .NET (ASP.NET Core Web API)</li>
+                    <li>Árbol N-ario de categorías</li>
+                    <li>Árbol Binario de Búsqueda (BST) de libros</li>
+                    <li>Listas enlazadas propias</li>
+                    <li>Graphviz para reportes</li>
+                    <li>HTML + CSS + JavaScript puro</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= TOAST / MENSAJES ================= -->
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

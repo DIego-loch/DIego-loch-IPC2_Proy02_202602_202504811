@@ -1,0 +1,8 @@
+digraph G {
+  node [shape=record, style=filled, fillcolor="#C8E6C9"];
+  label="Libros en: Distopía";
+  labelloc=t;
+  n0 [label="{ ISBN: 1001 | 1984 | George Orwell }"];
+  n1 [label="{ ISBN: 1002 | Un Mundo Feliz | Aldous Huxley }"];
+  n0 -> n1;
+}

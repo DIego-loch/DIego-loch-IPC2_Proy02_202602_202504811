@@ -1,6 +1,6 @@
 using System;
 
-namespace IPC2_Proy02.Modelo
+namespace Proyecto2.Modelo
 {
     // Lista enlazada simple de categorías (hijos), ordenada alfabéticamente
     public class ListaHijos

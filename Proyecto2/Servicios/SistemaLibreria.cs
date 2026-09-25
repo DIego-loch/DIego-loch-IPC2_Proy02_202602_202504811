@@ -1,7 +1,7 @@
 using System;
-using IPC2_Proy02.Modelo;
+using Proyecto2.Modelo;
 
-namespace IPC2_Proy02.Servicios
+namespace Proyecto2.Servicios
 {
     public class SistemaLibreria
     {

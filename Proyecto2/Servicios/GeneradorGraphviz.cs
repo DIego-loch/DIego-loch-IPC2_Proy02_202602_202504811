@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using IPC2_Proy02.Modelo;
+using Proyecto2.Modelo;
 
-namespace IPC2_Proy02.Servicios
+namespace Proyecto2.Servicios
 {
     public class GeneradorGraphviz
     {
@@ -130,7 +130,7 @@ namespace IPC2_Proy02.Servicios
                 // Graphviz no instalado o no en PATH: se genera solo el .dot
             }
 
-            return rutaPng;
+            return "/Reportes/" + nombre + ".png";
         }
 
         private string Escapar(string s)
