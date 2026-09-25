@@ -92,7 +92,7 @@ async function inicializarSistema() {
     try {
         const res = await fetch(`${API}/api/sistema/inicializar`, { method: "POST" });
         const data = await res.json();
-        document.getElementById("estadoSistema").textContent = "Inicializado ✅";
+        document.getElementById("estadoSistema").textContent = "INICIALIZADO PAPA";
         document.getElementById("totalLibros").textContent = "0";
         document.getElementById("totalCategorias").textContent = "0";
         toast(data.msg || "Sistema reiniciado", "exito");
@@ -135,11 +135,11 @@ async function subirXml() {
         log.textContent = data.msg || "Procesado";
         toast(data.msg || "XML cargado", data.ok ? "exito" : "error");
 
-        // Refrescar vistas
+
         cargarCategorias();
         cargarLibros();
 
-        // Actualizar contadores del Inicio
+
         try {
             const rCats = await fetch(`${API}/api/categorias`);
             const dCats = await rCats.json();
@@ -158,9 +158,7 @@ async function subirXml() {
     }
 }
 
-// =========================================================
-//  API: CATEGORÍAS
-// =========================================================
+
 async function cargarCategorias() {
     try {
         const res = await fetch(`${API}/api/categorias`);
@@ -221,7 +219,7 @@ async function crearCategoria() {
     }
 }
 
-// ✅ VERSIÓN CORREGIDA
+
 async function verGrafoCategorias() {
     const cont = document.getElementById("imgGrafoCats");
 
@@ -239,9 +237,7 @@ async function verGrafoCategorias() {
     }
 }
 
-// =========================================================
-//  API: LIBROS
-// =========================================================
+
 async function cargarLibros() {
     try {
         const res = await fetch(`${API}/api/libros`);
@@ -404,7 +400,7 @@ function mostrarResultadoBusqueda(libro, titulo) {
     `;
 }
 
-// ✅ VERSIÓN CORREGIDA
+
 async function verLibrosCategoria() {
     const nombre = document.getElementById("catFiltro").value.trim();
     if (!nombre) {
@@ -428,9 +424,7 @@ async function verLibrosCategoria() {
     }
 }
 
-// =========================================================
-//  ARRANQUE
-// =========================================================
+
 window.addEventListener("DOMContentLoaded", () => {
-    console.log("Sistema de Librería listo 🚀");
+    console.log("Sistema de Librería listo");
 });

@@ -20,7 +20,7 @@ namespace Proyecto2.Controladores
             _cargador = cargador;
         }
 
-        // POST /api/sistema/inicializar
+
         [HttpPost("inicializar")]
         public IActionResult Inicializar()
         {
@@ -29,7 +29,7 @@ namespace Proyecto2.Controladores
                            "application/json");
         }
 
-        // POST /api/sistema/cargar-xml  (por ruta del servidor)
+
         [HttpPost("cargar-xml")]
         public IActionResult CargarXml([FromBody] RutaDTO dto)
         {
@@ -46,7 +46,7 @@ namespace Proyecto2.Controladores
             return Content(sb.ToString(), "application/json");
         }
 
-        // POST /api/sistema/subir-xml  (archivo subido desde el navegador)
+
         [HttpPost("subir-xml")]
         public IActionResult SubirXml(IFormFile archivo)
         {
@@ -57,16 +57,11 @@ namespace Proyecto2.Controladores
             string msg;
             using (Stream stream = archivo.OpenReadStream())
             {
-                // ✅ Delega al CargadorXML (misma lógica, sin duplicar)
                 msg = _cargador.CargarDesdeStream(stream);
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append("{\"ok\":true,\"msg\":\"");
-            sb.Append(EscaparJSON(msg));
-            sb.Append("\"}");
-
-            return Content(sb.ToString(), "application/json");
+            return Content("{\"ok\":true,\"msg\":\"" + EscaparJSON(msg) + "\"}",
+                           "application/json");
         }
 
         private string EscaparJSON(string s)

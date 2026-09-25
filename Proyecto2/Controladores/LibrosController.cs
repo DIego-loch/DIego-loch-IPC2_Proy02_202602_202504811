@@ -19,7 +19,7 @@ namespace Proyecto2.Controladores
             _gv = gv;
         }
 
-        // GET /api/libros  → todos ascendente por ISBN
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -28,7 +28,7 @@ namespace Proyecto2.Controladores
             return Content(json, "application/json");
         }
 
-        // GET /api/libros/123
+
         [HttpGet("{isbn}")]
         public IActionResult Get(int isbn)
         {
@@ -39,7 +39,7 @@ namespace Proyecto2.Controladores
             return Content(LibroAJson(l), "application/json");
         }
 
-        // POST /api/libros
+
         [HttpPost]
         public IActionResult Post([FromBody] LibroDTO dto)
         {
@@ -54,7 +54,7 @@ namespace Proyecto2.Controladores
             return Content("{\"ok\":true}", "application/json");
         }
 
-        // DELETE /api/libros/123
+
         [HttpDelete("{isbn}")]
         public IActionResult Delete(int isbn)
         {
@@ -63,7 +63,7 @@ namespace Proyecto2.Controladores
             return Content("{\"ok\":false,\"msg\":\"No existe\"}", "application/json");
         }
 
-        // GET /api/libros/menor
+
         [HttpGet("menor")]
         public IActionResult Menor()
         {
@@ -73,7 +73,7 @@ namespace Proyecto2.Controladores
             return Content(LibroAJson(l), "application/json");
         }
 
-        // GET /api/libros/mayor
+
         [HttpGet("mayor")]
         public IActionResult Mayor()
         {
@@ -83,7 +83,7 @@ namespace Proyecto2.Controladores
             return Content(LibroAJson(l), "application/json");
         }
 
-        // GET /api/libros/categoria/Ficción
+
         [HttpGet("categoria/{nombre}")]
         public IActionResult PorCategoria(string nombre)
         {
@@ -102,9 +102,7 @@ namespace Proyecto2.Controladores
             return Content(sb.ToString(), "application/json");
         }
 
-        // ========================================================
-        //  CONVERSORES A JSON (sin List<>, sin serializer)
-        // ========================================================
+
 
         private string LibroAJson(Libro l)
         {
@@ -120,7 +118,7 @@ namespace Proyecto2.Controladores
             return sb.ToString();
         }
 
-        // Si conMetadata = true, devuelve arreglo de libros; si no, solo uno
+
         private string ListaLibrosAJson(ListaLibros lista, bool comoArreglo)
         {
             StringBuilder sb = new StringBuilder();
@@ -149,7 +147,7 @@ namespace Proyecto2.Controladores
         }
     }
 
-    // DTO para recibir JSON desde la web
+
     public class LibroDTO
     {
         public int ISBN { get; set; }

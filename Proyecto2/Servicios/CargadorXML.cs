@@ -13,7 +13,6 @@ namespace Proyecto2.Servicios
             sistema = s;
         }
 
-        // Cargar por ruta (endpoint /cargar-xml)
         public string Cargar(string ruta)
         {
             if (!File.Exists(ruta))
@@ -25,54 +24,80 @@ namespace Proyecto2.Servicios
             }
         }
 
-        // Cargar desde un stream (endpoint /subir-xml)
         public string CargarDesdeStream(Stream stream)
         {
-            int nCats = 0;
-            int nLibs = 0;
-            int rechazadas = 0;
-            int rechazados = 0;
+            int nCats = 0, nLibs = 0;
+            int catsRechazadas = 0, libsRechazados = 0;
 
             try
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(stream);
 
-                // ---------------- CATEGORÍAS ----------------
+                // ============ CATEGORÍAS (2 PASADAS) ============
                 XmlNodeList cats = doc.SelectNodes("//listaCategorias/categoria");
                 if (cats == null || cats.Count == 0)
                     cats = doc.SelectNodes("//listacategorias/categoria");
 
                 if (cats != null)
                 {
-                    foreach (XmlNode c in cats)
+                    // ---- PASO 1: insertar las que se puedan ----
+                    for (int i = 0; i < cats.Count; i++)
                     {
-                        string nombre = null;
-                        string padre = null;
+                        XmlNode c = cats[i];
+                        string nombre = ExtraerNombreCat(c);
+                        string padre = c.Attributes["padre"] != null
+                            ? c.Attributes["padre"].Value : null;
 
-                        // 1) Atributo nombre (entrada.xml)
-                        if (c.Attributes["nombre"] != null)
-                            nombre = c.Attributes["nombre"].Value;
-
-                        // 2) Texto interno (entrada_100.xml)
-                        if (string.IsNullOrWhiteSpace(nombre))
-                            nombre = c.InnerText != null ? c.InnerText.Trim() : null;
-
-                        // Padre
-                        if (c.Attributes["padre"] != null)
-                            padre = c.Attributes["padre"].Value;
-
-                        if (string.IsNullOrWhiteSpace(nombre))
-                            continue;
+                        if (string.IsNullOrWhiteSpace(nombre)) continue;
 
                         if (sistema.AgregarCategoria(nombre, padre))
                             nCats++;
-                        else
-                            rechazadas++;
                     }
+
+                    // ---- PASO 2: reintentar huérfanas ----
+                    bool huboCambios = true;
+                    int iteracion = 0;
+                    while (huboCambios && iteracion < 10)
+                    {
+                        huboCambios = false;
+                        iteracion++;
+
+                        for (int i = 0; i < cats.Count; i++)
+                        {
+                            XmlNode c = cats[i];
+                            string nombre = ExtraerNombreCat(c);
+                            string padre = c.Attributes["padre"] != null
+                                ? c.Attributes["padre"].Value : null;
+
+                            if (string.IsNullOrWhiteSpace(nombre)) continue;
+                            if (sistema.BuscarCategoria(nombre) != null) continue;
+
+                            if (string.IsNullOrEmpty(padre))
+                            {
+                                if (sistema.AgregarCategoria(nombre, null))
+                                {
+                                    nCats++;
+                                    huboCambios = true;
+                                }
+                                continue;
+                            }
+
+                            if (sistema.BuscarCategoria(padre) != null)
+                            {
+                                if (sistema.AgregarCategoria(nombre, padre))
+                                {
+                                    nCats++;
+                                    huboCambios = true;
+                                }
+                            }
+                        }
+                    }
+
+                    catsRechazadas = cats.Count - nCats;
                 }
 
-                // ---------------- LIBROS ----------------
+                // ============ LIBROS ============
                 XmlNodeList libs = doc.SelectNodes("//listaLibros/libro");
                 if (libs == null || libs.Count == 0)
                     libs = doc.SelectNodes("//listalibros/libro");
@@ -81,39 +106,21 @@ namespace Proyecto2.Servicios
                 {
                     foreach (XmlNode l in libs)
                     {
-                        // ISBN: atributo o nodo hijo
-                        int isbn = 0;
+                        int isbn = ExtraerIsbn(l);
+                        if (isbn <= 0) { libsRechazados++; continue; }
 
-                        if (l.Attributes["isbn"] != null)
-                            int.TryParse(l.Attributes["isbn"].Value, out isbn);
-                        else if (l.Attributes["ISBN"] != null)
-                            int.TryParse(l.Attributes["ISBN"].Value, out isbn);
-                        else
-                        {
-                            XmlNode nIsbn = l.SelectSingleNode("ISBN");
-                            if (nIsbn == null) nIsbn = l.SelectSingleNode("isbn");
-                            if (nIsbn != null)
-                                int.TryParse(nIsbn.InnerText.Trim(), out isbn);
-                        }
+                        XmlNode nT = l.SelectSingleNode("titulo");
+                        XmlNode nA = l.SelectSingleNode("autor");
+                        XmlNode nC = l.SelectSingleNode("categoria");
 
-                        if (isbn <= 0) { rechazados++; continue; }
-
-                        XmlNode nTitulo = l.SelectSingleNode("titulo");
-                        if (nTitulo == null) nTitulo = l.SelectSingleNode("Titulo");
-                        string titulo = nTitulo != null ? nTitulo.InnerText.Trim() : "";
-
-                        XmlNode nAutor = l.SelectSingleNode("autor");
-                        if (nAutor == null) nAutor = l.SelectSingleNode("Autor");
-                        string autor = nAutor != null ? nAutor.InnerText.Trim() : "";
-
-                        XmlNode nCat = l.SelectSingleNode("categoria");
-                        if (nCat == null) nCat = l.SelectSingleNode("Categoria");
-                        string categoria = nCat != null ? nCat.InnerText.Trim() : "";
+                        string titulo = nT != null ? nT.InnerText.Trim() : "";
+                        string autor = nA != null ? nA.InnerText.Trim() : "";
+                        string categoria = nC != null ? nC.InnerText.Trim() : "";
 
                         if (sistema.AgregarLibro(isbn, titulo, autor, categoria))
                             nLibs++;
                         else
-                            rechazados++;
+                            libsRechazados++;
                     }
                 }
             }
@@ -124,8 +131,40 @@ namespace Proyecto2.Servicios
 
             return "OK - Categorías: " + nCats +
                    " | Libros: " + nLibs +
-                   " | Rechazadas: " + rechazadas +
-                   " | Rechazados: " + rechazados;
+                   " | Categorías rechazadas: " + catsRechazadas +
+                   " | Libros rechazados: " + libsRechazados;
+        }
+
+        private string ExtraerNombreCat(XmlNode c)
+        {
+            string nombre = null;
+
+            if (c.Attributes["nombre"] != null)
+                nombre = c.Attributes["nombre"].Value;
+
+            if (string.IsNullOrWhiteSpace(nombre) && c.InnerText != null)
+                nombre = c.InnerText.Trim();
+
+            return nombre;
+        }
+
+        private int ExtraerIsbn(XmlNode l)
+        {
+            int isbn = 0;
+
+            if (l.Attributes["isbn"] != null)
+                int.TryParse(l.Attributes["isbn"].Value, out isbn);
+            else if (l.Attributes["ISBN"] != null)
+                int.TryParse(l.Attributes["ISBN"].Value, out isbn);
+            else
+            {
+                XmlNode nIsbn = l.SelectSingleNode("ISBN");
+                if (nIsbn == null) nIsbn = l.SelectSingleNode("isbn");
+                if (nIsbn != null)
+                    int.TryParse(nIsbn.InnerText.Trim(), out isbn);
+            }
+
+            return isbn;
         }
     }
 }

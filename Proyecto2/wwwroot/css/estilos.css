@@ -1,6 +1,4 @@
-/* =========================================================
-   RESET Y BASE
-   ========================================================= */
+
 * {
     margin: 0;
     padding: 0;
@@ -32,9 +30,7 @@ body {
     flex-direction: column;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+
 header {
     background: linear-gradient(135deg, #1e40af, #3b82f6);
     color: white;
@@ -91,9 +87,7 @@ nav {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* =========================================================
-   MAIN Y PANELES
-   ========================================================= */
+
 main {
     flex: 1;
     padding: 2rem;
@@ -133,9 +127,7 @@ h3 {
     margin-bottom: 1.5rem;
 }
 
-/* =========================================================
-   BOTONES
-   ========================================================= */
+
 button {
     font-family: inherit;
 }
@@ -179,9 +171,7 @@ button {
     background: #b91c1c;
 }
 
-/* =========================================================
-   INPUTS Y FORMULARIOS
-   ========================================================= */
+
 input[type="text"],
 input[type="number"] {
     padding: 0.65rem 0.9rem;
@@ -225,9 +215,7 @@ input[type="number"]:focus {
     width: 100%;
 }
 
-/* =========================================================
-   TARJETAS
-   ========================================================= */
+
 .info-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -292,9 +280,7 @@ input[type="number"]:focus {
     flex-wrap: wrap;
 }
 
-/* =========================================================
-   TABLA
-   ========================================================= */
+
 .tabla-container {
     background: var(--fondo-card);
     border-radius: 12px;
@@ -343,9 +329,7 @@ tbody tr:hover {
     padding: 2rem !important;
 }
 
-/* =========================================================
-   ÁRBOL DE CATEGORÍAS
-   ========================================================= */
+
 .arbol {
     background: var(--fondo-card);
     border-radius: 12px;
@@ -371,9 +355,7 @@ tbody tr:hover {
     border-left: 3px solid var(--primario);
 }
 
-/* =========================================================
-   LAYOUT DOBLE
-   ========================================================= */
+
 .layout-doble {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -387,9 +369,7 @@ tbody tr:hover {
     }
 }
 
-/* =========================================================
-   IMAGEN GRAPHVIZ
-   ========================================================= */
+
 .contenedor-imagen {
     background: var(--fondo-card);
     border-radius: 12px;
@@ -413,9 +393,7 @@ tbody tr:hover {
     font-style: italic;
 }
 
-/* =========================================================
-   LOG / RESULTADO
-   ========================================================= */
+
 .log {
     background: #1e293b;
     color: #86efac;
@@ -457,9 +435,7 @@ tbody tr:hover {
     overflow-x: auto;
 }
 
-/* =========================================================
-   TOAST (notificaciones)
-   ========================================================= */
+
 .toast {
     position: fixed;
     bottom: 2rem;
